@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'transparent'
   },
   overlayRightWrapper: {
     position: 'absolute',
@@ -66,7 +65,9 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    position: 'absolute',
+    margin: 0,
+    padding: 0
+    // position: 'absolute',
   }
 });
 
@@ -127,7 +128,7 @@ export default class SwipeCards extends Component {
     stack: false,
     stackDepth: 2,
     stackOffsetX: 0,
-    stackOffsetY: 12,
+    stackOffsetY: 0,
     showRightOverlay: true,
     showUpOverlay: false,
     showLeftOverlay: true,
@@ -179,94 +180,94 @@ export default class SwipeCards extends Component {
     this.lastY = 0;
 
     this.cardAnimation = null;
+    this._panResponder = {}
+    // this._panResponder = PanResponder.create({
+    //   onMoveShouldSetPanResponderCapture: (e, gestureState) => {
+    //     if (Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3) {
+    //       this.props.onDragStart();
+    //       return true;
+    //     }
+    //     return false;
+    //   },
 
-    this._panResponder = PanResponder.create({
-      onMoveShouldSetPanResponderCapture: (e, gestureState) => {
-        if (Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3) {
-          this.props.onDragStart();
-          return true;
-        }
-        return false;
-      },
+    //   onPanResponderGrant: (e, gestureState) => {
+    //     this.state.pan.setOffset({ x: this.state.pan.x._value, y: this.state.pan.y._value });
+    //     this.state.pan.setValue({ x: 0, y: 0 });
+    //   },
 
-      onPanResponderGrant: (e, gestureState) => {
-        this.state.pan.setOffset({ x: this.state.pan.x._value, y: this.state.pan.y._value });
-        this.state.pan.setValue({ x: 0, y: 0 });
-      },
+    //   onPanResponderTerminationRequest: (evt, gestureState) => this.props.allowGestureTermination,
 
-      onPanResponderTerminationRequest: (evt, gestureState) => this.props.allowGestureTermination,
+    //   onPanResponderMove: Animated.event([
+    //     null, { dx: this.state.pan.x, dy: this.props.dragY ? this.state.pan.y : 0 },
+    //   ]),
 
-      onPanResponderMove: Animated.event([
-        null, { dx: this.state.pan.x, dy: this.props.dragY ? this.state.pan.y : 0 },
-      ]),
+    //   onPanResponderRelease: (e, { vx, vy, dx, dy }) => {
+    //     this.props.onDragRelease()
+    //     this.state.pan.flattenOffset();
+    //     let velocity;
+    //     if (Math.abs(dx) <= 5 && Math.abs(dy) <= 5)   //meaning the gesture did not cover any distance
+    //     {
+    //       this.props.onClickHandler(this.state.card)
+    //     }
 
-      onPanResponderRelease: (e, { vx, vy, dx, dy }) => {
-        this.props.onDragRelease()
-        this.state.pan.flattenOffset();
-        let velocity;
-        if (Math.abs(dx) <= 5 && Math.abs(dy) <= 5)   //meaning the gesture did not cover any distance
-        {
-          // this.props.onClickHandler(this.state.card)
-        }
+    //     if (vx > 0) {
+    //       velocity = clamp(vx, 3, 5);
+    //     } else if (vx < 0) {
+    //       velocity = clamp(vx * -1, 3, 5) * -1;
+    //     } else {
+    //       velocity = dx < 0 ? -3 : 3;
+    //     }
 
-        if (vx > 0) {
-          velocity = clamp(vx, 3, 5);
-        } else if (vx < 0) {
-          velocity = clamp(vx * -1, 3, 5) * -1;
-        } else {
-          velocity = dx < 0 ? -3 : 3;
-        }
+    //     const hasSwipedHorizontally = Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD
+    //     const hasSwipedVertically = Math.abs(this.state.pan.y._value) > SWIPE_THRESHOLD
+    //     if (hasSwipedHorizontally || (hasSwipedVertically && this.props.swipeUp)) {
 
-        const hasSwipedHorizontally = Math.abs(this.state.pan.x._value) > SWIPE_THRESHOLD
-        const hasSwipedVertically = Math.abs(this.state.pan.y._value) > SWIPE_THRESHOLD
-        if (hasSwipedHorizontally || (hasSwipedVertically && this.props.swipeUp)) {
+    //       let cancelled = false;
 
-          let cancelled = false;
+    //       const hasMovedRight = hasSwipedHorizontally && this.state.pan.x._value > 0
+    //       const hasMovedLeft = hasSwipedHorizontally && this.state.pan.x._value < 0
+    //       const hasMovedUp = hasSwipedVertically && this.state.pan.y._value < 0
 
-          const hasMovedRight = hasSwipedHorizontally && this.state.pan.x._value > 0
-          const hasMovedLeft = hasSwipedHorizontally && this.state.pan.x._value < 0
-          const hasMovedUp = hasSwipedVertically && this.state.pan.y._value < 0
+    //       if (hasMovedRight) {
+    //         cancelled = this.props.onSwipeRight(this.state.card);
+    //       } else if (hasMovedLeft) {
+    //         cancelled = this.props.onSwipeLeft(this.state.card);
+    //       } else if (hasMovedUp && this.props.swipeUp) {
+    //         cancelled = this.props.onSwipeUp(this.state.card);
+    //       } else {
+    //         cancelled = true
+    //       }
 
-          if (hasMovedRight) {
-            cancelled = this.props.onSwipeRight(this.state.card);
-          } else if (hasMovedLeft) {
-            cancelled = this.props.onSwipeLeft(this.state.card);
-          } else if (hasMovedUp && this.props.swipeUp) {
-            cancelled = this.props.onSwipeUp(this.state.card);
-          } else {
-            cancelled = true
-          }
+    //       //Yup or nope was cancelled, return the card to normal.
+    //       if (cancelled) {
+    //         this._resetPan();
+    //         return;
+    //       };
 
-          //Yup or nope was cancelled, return the card to normal.
-          if (cancelled) {
-            this._resetPan();
-            return;
-          };
+    //       this.props.cardRemoved(currentIndex[this.guid]);
 
-          this.props.cardRemoved(currentIndex[this.guid]);
+    //       if (this.props.smoothTransition) {
+    //         this._advanceState();
+    //       } else {
+    //         this.cardAnimation = Animated.decay(this.state.pan, {
+    //           velocity: { x: velocity, y: vy },
+    //           deceleration: 0.98,
+    //           useNativeDriver: true
+    //         });
+    //         this.cardAnimation.start(status => {
+    //           if (status.finished) this._advanceState();
+    //           else this._resetState();
 
-          if (this.props.smoothTransition) {
-            this._advanceState();
-          } else {
-            this.cardAnimation = Animated.decay(this.state.pan, {
-              velocity: { x: velocity, y: vy },
-              deceleration: 0.98,
-              useNativeDriver: true
-            });
-            this.cardAnimation.start(status => {
-              if (status.finished) this._advanceState();
-              else this._resetState();
+    //           this.cardAnimation = null;
+    //         }
+    //         );
+    //       }
 
-              this.cardAnimation = null;
-            }
-            );
-          }
-
-        } else {
-          this._resetPan();
-        }
-      }
-    });
+    //     } else {
+    //       this._resetPan();
+    //     }
+    //   }
+    // });
   }
 
 
@@ -361,10 +362,9 @@ export default class SwipeCards extends Component {
       this.state.enter,
       {
         toValue: 1,
-        bounciness: 3,
-        speed: 15,
-        // friction: 3,
-        // tension: 20,
+        friction: 7,
+        tension: 40,
+        duration: 350,
         useNativeDriver: true
       }
     ).start();
@@ -389,12 +389,9 @@ export default class SwipeCards extends Component {
   _resetPan() {
     Animated.spring(this.state.pan, {
       toValue: { x: 0, y: 0 },
-      bounciness: 4,
-      speed: 17,
+      friction: 4,
       useNativeDriver: true
-    }).start(status => {
-      if (status.finished) this.state.pan.setValue({ x: 0, y: 0 })
-    });
+    }).start();
   }
 
   _resetState() {
@@ -465,7 +462,7 @@ export default class SwipeCards extends Component {
         let [translateX, translateY] = [pan.x, pan.y];
 
         let rotate = this.props.rotation ? pan.x.interpolate({ inputRange: [-this.state.width / 2, 0, this.state.width / 2], outputRange: ["-10deg", "0deg", "10deg"] }) : '0deg';
-        let opacity = this.props.smoothTransition ? 1 : pan.x.interpolate({ inputRange: [-this.state.width / 2, -this.state.width / 3, 0, this.state.width / 3, this.state.width / 2], outputRange: [0.3, .6, 1, .6, 0.3] });
+        let opacity = this.props.smoothTransition ? 1 : pan.x.interpolate({ inputRange: [-this.state.width / 2, -this.state.width / 3, 0, this.state.width / 3, this.state.width / 2], outputRange: [0.3, .6, 1, .6, 0.3]});
 
         let animatedCardStyles = {
           ...style,
@@ -478,7 +475,7 @@ export default class SwipeCards extends Component {
           ]
         };
 
-        return <Animated.View key={key} style={[styles.card, animatedCardStyles, cardStyle, this.props.cardStyle, { left: this.props.x, top: this.props.y, right: this.props.x, bottom: this.props.y }]} {... this._panResponder.panHandlers}>
+        return <Animated.View key={key} style={[styles.card, animatedCardStyles, cardStyle, this.props.cardStyle, { left: this.props.x, top: this.props.y, right: this.props.x, bottom: this.props.y  }]} {... this._panResponder.panHandlers}>
           {this.renderLeftOverlay()}
           {this.renderRightOverlay()}
           {this.props.renderCard(this.state.card)}
@@ -493,7 +490,7 @@ export default class SwipeCards extends Component {
     if (!this.state.card) {
       return this.renderNoMoreCards();
     }
-    let cardStyle = { width: this.state.viewMode === 'portrait' ? this.state.width - 50 : this.state.width * .8, height: this.state.viewMode === 'portrait' ? this.state.height * .8 : this.state.height - 50 }
+    let cardStyle = { width: this.state.viewMode === 'portrait' ? this.state.width  : this.state.width * .8, height: this.state.viewMode === 'portrait' ? this.state.height * .8 : this.state.height - 50 }
     const key = this.getCardKey(this.state.card)
 
     let { pan, enter } = this.state;
